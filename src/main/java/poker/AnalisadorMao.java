@@ -36,7 +36,7 @@ public class AnalisadorMao {
      * @return
      */
     public boolean isFourOfKind(List<Carta> cartList) {
-        return pairOf(cartList, 4);
+        return occurs(cartList, 4);
     }
 
     /**
@@ -99,7 +99,7 @@ mesmo naipes
      * @return
      */
     public boolean isThreeOfKind(List<Carta> cartList) {
-        return pairOf(cartList, 3);
+        return occurs(cartList, 3);
     }
 
     /**
@@ -111,7 +111,9 @@ mesmo naipes
      * @return
      */
     public boolean isTwoPairs(List<Carta> cartList) {
-        return pairOf(cartList, 2);
+        Map<Integer, Long> valueCountMap = cartList.stream()
+                .collect(Collectors.groupingBy(c -> c.getValor(), Collectors.counting()));
+        return valueCountMap.values().stream().filter(v -> v == 2).count() == 2;
     }
 
     /**
@@ -121,9 +123,15 @@ mesmo naipes
      * @return
      */
     public boolean isOnePair(List<Carta> cartList) {
-        return pairOf(cartList, 1);
+        return occurs(cartList, 2);
     }
 
+    /**
+     * Verifica se uma lista de cartas contém uma sequência de valores
+     * @param cartList
+     * @param sequence
+     * @return
+     */
     public static boolean containsSequence(List<Carta> cartList, int[] sequence) {
         int[] values = cartList.stream()
                 .mapToInt(c -> c.getValor())
@@ -134,14 +142,27 @@ mesmo naipes
                         .allMatch(j -> values[i + j] == sequence[j]));
     }
 
+
+    /**
+     * Verifica se há apenas um naipe em uma lista de cartas
+     * @param cartas
+     * @return
+     */
     private boolean hasOnlyOneNaipe(List<Carta> cartas) {
         return cartas.stream().map(c -> c.getNaipe()).distinct().count() == 1;
     }
 
-    private boolean pairOf(List<Carta> cartList, long pairCount) {
+    /**
+     * Verifica se uma lista de cartas possui um certo número de ocorrências em cartas.
+     * Útil para verificar se há pares, trincas, quadras, etc.
+     * @param cartList
+     * @param numberOfOccurences
+     * @return
+     */
+    private boolean occurs(List<Carta> cartList, long numberOfOccurences) {
         Map<Integer, Long> valueCountMap = cartList.stream()
                 .collect(Collectors.groupingBy(c -> c.getValor(), Collectors.counting()));
-        return valueCountMap.containsValue(pairCount);
+        return valueCountMap.containsValue(numberOfOccurences);
     }
 
 }
