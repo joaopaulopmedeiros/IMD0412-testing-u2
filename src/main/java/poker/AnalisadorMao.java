@@ -1,21 +1,27 @@
 package poker;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class AnalisadorMao {
 
     /**
-     * Royal Straight Flush: Sequência de 10 ao Ás (10-J-Q-K-A) sendo todas do mesmo naipe
+     * Royal Straight Flush: Sequência de 10 ao Ás (10-J-Q-K-A) sendo todas do mesmo
+     * naipe
+     * 
      * @param cartList
      * @return
      */
     public boolean isRoyalStraightFlush(List<Carta> cartList) {
-        return containsSequence(cartList, new int[]{10,11,12,13,1}) && hasOnlyOneNaipe(cartList);
+        return containsSequence(cartList, new int[] { 10, 11, 12, 13, 1 }) && hasOnlyOneNaipe(cartList);
     }
 
     /**
      * Straight Flush: Sequência de 5 cartas todas do mesmo naipe
+     * 
      * @param cartList
      * @return
      */
@@ -25,69 +31,97 @@ public class AnalisadorMao {
 
     /**
      * Quadra (Four of a kind): 4 cartas com mesmo valor
+     * 
      * @param cartas
      * @return
      */
     public boolean isFourOfKind(List<Carta> cartList) {
-        return cartList.stream()
-                .mapToInt(c -> c.getValor())
-                .distinct()
-                .count() == 2;
+        return pairOf(cartList, 4);
     }
 
     /**
-     * Full House: Um par (One pair )e Trinca (Three of a kind ) ao mesmo tempo
+     * Full House: Um par (One pair ) e Trinca (Three of a kind ) ao mesmo tempo
+     * 
      * @param cartas
      * @return
      */
-    public boolean isFullHouse(List<Carta> cartas) {
-        return isOnePair(cartas) && isThreeOfKind(cartas);
+    public boolean isFullHouse(List<Carta> cartList) {
+        Map<Integer, Integer> valueCountMap = new HashMap<>();
+
+        for (Carta cart : cartList) {
+            int value = cart.getValor();
+            valueCountMap.put(value, valueCountMap.getOrDefault(value, 0) + 1);
+        }
+
+        boolean hasThreeOfAKind = false;
+        boolean hasPair = false;
+
+        for (int count : valueCountMap.values()) {
+            if (count == 3) {
+                hasThreeOfAKind = true;
+            } else if (count == 2) {
+                hasPair = true;
+            }
+        }
+
+        return hasThreeOfAKind && hasPair;
     }
 
     /**
-     * Trinca (Three of a kind): 3 cartas com mesmo valor
+     * 5 cartas do mesmo naipe e que não formam uma sequência
+     * 
      * @param cartas
      * @return
      */
-    public boolean isThreeOfKind(List<Carta> cartas) {
-        return cartas.stream()
-                .mapToInt(c -> c.getValor())
-                .distinct()
-                .count() == 3;
+    public boolean isFlush(List<Carta> cartas) {
+        return hasOnlyOneNaipe(cartas) && !isSequence(cartas);
     }
 
     /**
-     * Dois pares (Two Pairs): 2 cartas com um mesmo valor, e outras 2 cartas com outro
-mesmo valor
-     * @param cartas
+     * 5 cartas que formam uma sequência, mas que não são todas do
+mesmo naipes
+     * @param cartList
      * @return
      */
-    public boolean isTwoPairs(List<Carta> cartas) {
-        return cartas.stream()
-                .mapToInt(c -> c.getValor())
-                .distinct()
-                .count() == 3;
-    }
-
-    /**
-     * Um par (One Pair): 2 cartas com o mesmo valoR
-     * @param cartas
-     * @return
-     */
-    public boolean isOnePair(List<Carta> cartas) {
-        return cartas.stream()
-                .mapToInt(c -> c.getValor())
-                .distinct()
-                .count() == 4;
-    }
-
-    boolean isSequence(List<Carta> cartList) {
+    public boolean isSequence(List<Carta> cartList) {
         int[] values = cartList.stream()
                 .mapToInt(c -> c.getValor())
                 .toArray();
 
         return IntStream.range(0, values.length - 1)
                 .allMatch(i -> values[i] + 1 == values[i + 1]);
+    }
+
+    /**
+     * Trinca (Three of a kind): 3 cartas com mesmo valor
+     * 
+     * @param cartas
+     * @return
+     */
+    public boolean isThreeOfKind(List<Carta> cartList) {
+        return pairOf(cartList, 3);
+    }
+
+    /**
+     * Dois pares (Two Pairs): 2 cartas com um mesmo valor, e outras 2 cartas com
+     * outro
+     * mesmo valor
+     * 
+     * @param cartas
+     * @return
+     */
+    public boolean isTwoPairs(List<Carta> cartList) {
+        return pairOf(cartList, 2);
+    }
+
+    /**
+     * Um par (One Pair): 2 cartas com o mesmo valoR
+     * 
+     * @param cartas
+     * @return
+     */
+    public boolean isOnePair(List<Carta> cartList) {
+        return pairOf(cartList, 1);
     }
 
     public static boolean containsSequence(List<Carta> cartList, int[] sequence) {
@@ -104,13 +138,10 @@ mesmo valor
         return cartas.stream().map(c -> c.getNaipe()).distinct().count() == 1;
     }
 
-    /**
-     * 5 cartas do mesmo naipe e que não formam uma sequência
-     * @param cartas
-     * @return
-     */
-    public boolean isFlush(List<Carta> cartas) {
-        return hasOnlyOneNaipe(cartas) && !isSequence(cartas);
+    private boolean pairOf(List<Carta> cartList, long pairCount) {
+        Map<Integer, Long> valueCountMap = cartList.stream()
+                .collect(Collectors.groupingBy(c -> c.getValor(), Collectors.counting()));
+        return valueCountMap.containsValue(pairCount);
     }
 
 }
