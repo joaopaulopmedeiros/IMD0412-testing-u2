@@ -19,7 +19,7 @@ public class MaoTest {
 		cartas.add(carta().withValor(11).withNaipe(Naipe.COPAS).build());
 		cartas.add(carta().withValor(12).withNaipe(Naipe.COPAS).build());
 		cartas.add(carta().withValor(13).withNaipe(Naipe.COPAS).build());
-		cartas.add(carta().withValor(14).withNaipe(Naipe.COPAS).build());
+		cartas.add(carta().withValor(1).withNaipe(Naipe.COPAS).build());
 
 		Mao mao = new Mao(cartas);
 		
