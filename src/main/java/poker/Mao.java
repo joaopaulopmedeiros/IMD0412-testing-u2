@@ -23,7 +23,35 @@ public class Mao {
 			return RankingMao.STRAIGHT_FLUSH;
 		}
 
-		return RankingMao.SEQUENCIA;
+		if (this.analisador.isFourOfKind(this.cartas)) {
+			return RankingMao.QUADRA;
+		}
+
+		if (this.analisador.isFullHouse(this.cartas)) {
+			return RankingMao.FULL_HOUSE;
+		}
+
+		if (this.analisador.isFlush(this.cartas)) {
+			return RankingMao.FLUSH;
+		}
+
+		if (this.analisador.isThreeOfKind(this.cartas)) {
+			return RankingMao.TRINCA;
+		}
+
+		if (this.analisador.isSequence(this.cartas)) {
+			return RankingMao.SEQUENCIA;
+		}
+
+		if (this.analisador.isTwoPairs(this.cartas)) {
+			return RankingMao.DOIS_PARES;
+		}
+
+		if (this.analisador.isOnePair(this.cartas)) {
+			return RankingMao.UM_PAR;
+		}
+
+		return RankingMao.NADA;
 	}
 
 	public List<Carta> getCartas() {
