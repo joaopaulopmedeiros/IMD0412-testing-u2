@@ -13,8 +13,7 @@ public class Mao {
 	}
 
 	public RankingMao ranking() {
-		// TODO Auto-generated method stub
-		return null;
+		return RankingMao.SEQUENCIA;
 	}
 
 	public List<Carta> getCartas() {
